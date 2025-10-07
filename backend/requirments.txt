@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy>=1.4
+asyncpg
+python-jose[cryptography]
+passlib[bcrypt]
+httpx
+pgvector
+openai
+python-multipart
