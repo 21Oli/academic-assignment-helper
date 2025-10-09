@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Artificial Intelligence: An Overview of Modern Trends",
+    "authors": "John Smith, Emma Brown",
+    "publication_year": 2022,
+    "abstract": "An overview of recent developments in artificial intelligence, covering deep learning, natural language processing, and autonomous systems.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "The Future of Renewable Energy in Developing Nations",
+    "authors": "Amina Yusuf, Carlos Hernandez",
+    "publication_year": 2021,
+    "abstract": "This paper explores renewable energy strategies for developing nations, focusing on solar and wind energy adoption challenges.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Blockchain Technology in Financial Systems",
+    "authors": "Liu Chen, Robert Davis",
+    "publication_year": 2020,
+    "abstract": "A detailed analysis of how blockchain can transform traditional banking, reduce fraud, and enable decentralized finance.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Integrating Educational Technology for Better Learning Outcomes",
+    "authors": "Sarah Johnson, Ahmed Nasser",
+    "publication_year": 2023,
+    "abstract": "A study on the integration of educational technologies in higher education and their impact on student engagement and performance.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "AI Applications in Modern Healthcare",
+    "authors": "Priya Kumar, Daniel Roberts",
+    "publication_year": 2022,
+    "abstract": "An examination of artificial intelligence applications in medical diagnostics, predictive healthcare, and patient data management.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Cybersecurity Challenges in the Age of Cloud Computing",
+    "authors": "Michael Green, Laura Perez",
+    "publication_year": 2019,
+    "abstract": "A review of cloud computing vulnerabilities and strategies to enhance data security in distributed environments.",
+    "source_type": "White Paper"
+  },
+  {
+    "title": "Sustainable Urban Development and Smart Cities",
+    "authors": "Elena Petrova, Samuel Lee",
+    "publication_year": 2020,
+    "abstract": "Discusses the role of IoT and data analytics in shaping sustainable smart cities with efficient resource management.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Ethical Considerations of Artificial Intelligence in Society",
+    "authors": "Mark Wilson, Fatima Abdullahi",
+    "publication_year": 2021,
+    "abstract": "A philosophical exploration of ethical dilemmas related to AI autonomy, bias, and human oversight.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Machine Learning for Climate Prediction",
+    "authors": "Olivia Martin, Ethan Kim",
+    "publication_year": 2023,
+    "abstract": "Examines the use of machine learning models for forecasting weather patterns and climate change impacts.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Digital Transformation in Higher Education",
+    "authors": "Anna Scott, Yared Tsegaye",
+    "publication_year": 2024,
+    "abstract": "This research analyzes how universities are leveraging technology to modernize education delivery and improve learning experiences.",
+    "source_type": "Journal Article"
+  }
+]
