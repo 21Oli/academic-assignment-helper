@@ -1,31 +1,62 @@
-version: "3.8"
 services:
   db:
     image: pgvector/pgvector:pg16
+    container_name: academic-assignment-helper-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: academic-assignment-helper-backend
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      n8n:
+        condition: service_started
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL}
+      PYTHONPATH: /app
     volumes:
-      - ./backend:/app
+      - ./backend:/app/backend
       - ./data:/app/data
     ports:
       - "8000:8000"
+    command: >
+      sh -c "sleep 5 && uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=n8n
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - NODE_ENV=production
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
 
 volumes:
   db-data:
+  n8n_data:

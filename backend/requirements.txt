@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy>=1.4
+asyncpg
+python-jose[cryptography]
+passlib[bcrypt]==1.7.4
+bcrypt==3.2.2
+httpx
+pgvector
+python-multipart
+aiofiles
+PyPDF2
+python-docx
+docx
+numpy
