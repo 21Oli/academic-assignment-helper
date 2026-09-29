@@ -20,3 +20,20 @@ db-data/
 # OS-specific
 .DS_Store
 Thumbs.db
+
+# Next.js frontend
+frontend/.next/
+frontend/node_modules/
+frontend/.env.local
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Test / coverage artifacts
+.coverage
+coverage.xml
+.pytest_cache/
+htmlcov/
+
+# Embedding cache (large, regenerated on startup)
+data/embeddings_cache.json

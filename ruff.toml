@@ -1,0 +1,28 @@
+# Ruff configuration — linter + formatter for the backend
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long — handled by formatter
+    "B008",   # do not perform function calls in default args (FastAPI Depends pattern)
+    "SIM108", # ternary operator — sometimes less readable
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["S101"]  # allow assert in tests
+"alembic/*" = ["E402", "F401"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

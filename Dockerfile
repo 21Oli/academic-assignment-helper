@@ -1,27 +1,42 @@
 FROM python:3.11-slim
 
-# Set working directory
+# ---------------------------------------------------------------------------
+# Build argument: set to "true" to include sentence-transformers + torch
+# for offline local embedding fallback. Adds ~2 GB — disabled by default.
+#
+# Usage:  docker build --build-arg ENABLE_LOCAL_EMBEDDINGS=true .
+# ---------------------------------------------------------------------------
+ARG ENABLE_LOCAL_EMBEDDINGS=false
+
 WORKDIR /app
 
-# Copy requirements and install base dependencies
+# System deps needed by psycopg2-binary and some Python wheels
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 🧠 Install local embedding dependencies for fallback mode
-# (includes torch + sentence-transformers + numpy)
-RUN pip install --no-cache-dir torch sentence-transformers numpy
+# Conditionally install local embedding stack (~2 GB with torch)
+RUN if [ "$ENABLE_LOCAL_EMBEDDINGS" = "true" ]; then \
+        pip install --no-cache-dir torch sentence-transformers; \
+    fi
 
-# Copy backend code (for hot reload, we mount it later in docker-compose)
+# Copy backend source (hot-reload via volume mount in docker-compose)
 COPY backend /app/backend
 
-# Make Python see 'backend' as top-level package
-ENV PYTHONPATH=/app
+# Copy Alembic config so migrations can run inside the container
+COPY alembic.ini /app/alembic.ini
+COPY alembic /app/alembic
 
-# Unbuffered output
+ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
-# Optional: preload model weights during build (to avoid runtime downloads)
-# RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+# Expose the port Uvicorn listens on
+EXPOSE 8000
 
-# Run Uvicorn with reload (reload watches /app/backend)
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app/backend"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", \
+     "--reload", "--reload-dir", "/app/backend"]

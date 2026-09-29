@@ -1,3 +1,4 @@
--- This script runs inside the database specified by POSTGRES_DB (e.g. academic_helper).
--- The pgvector extension must be created in the app database, not in a separate one.
+-- Runs inside POSTGRES_DB (e.g. academic_helper) at first container start.
+-- Enables pgvector and creates the HNSW index for fast cosine similarity search.
+
 CREATE EXTENSION IF NOT EXISTS vector;
