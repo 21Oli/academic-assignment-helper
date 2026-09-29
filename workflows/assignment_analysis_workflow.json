@@ -5,65 +5,118 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "assignment",
-        "options": {
-          "responseData": "Analysis started successfully ",
-          "responseCode": 200
-        }
+        "responseMode": "responseNode",
+        "options": {}
       },
-      "id": "1",
+      "id": "node-webhook",
       "name": "Webhook (Trigger)",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [250, 300]
+      "position": [250, 300],
+      "notes": "Receives { assignment_id, student_email } from the backend upload route. Webhook URL: POST http://localhost:5678/webhook/assignment"
     },
     {
       "parameters": {
-        "requestMethod": "POST",
+        "method": "POST",
         "url": "http://backend:8000/analysis/start",
-        "jsonParameters": true,
-        "options": {},
-        "bodyParametersJson": "={\"assignment_id\": $json[\"assignment_id\"]}"
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.BACKEND_SERVICE_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "assignment_id",
+              "value": "={{ $json.assignment_id }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
       },
-      "id": "2",
-      "name": "Call Backend /analysis/start",
+      "id": "node-http-analysis",
+      "name": "POST /analysis/start",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 1,
-      "position": [550, 300]
+      "typeVersion": 4,
+      "position": [550, 300],
+      "notes": "Calls the FastAPI analysis endpoint. Requires BACKEND_SERVICE_TOKEN env var set in n8n with a valid student JWT."
     },
     {
       "parameters": {
-        "respondWith": "text",
-        "responseBody": "Analysis started successfully ",
-        "options": {}
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "equals",
+              "value2": "done"
+            }
+          ]
+        }
       },
-      "id": "3",
-      "name": "Respond to Webhook",
-      "type": "n8n-nodes-base.respondToWebhook",
+      "id": "node-if",
+      "name": "Analysis succeeded?",
+      "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, analysis_id: $json.result.analysis_id, plagiarism_score: $json.result.plagiarism_score }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "node-respond-ok",
+      "name": "Respond: Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1150, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: $json.error ?? 'Analysis failed' }) }}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "id": "node-respond-err",
+      "name": "Respond: Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1150, 400]
     }
   ],
   "connections": {
     "Webhook (Trigger)": {
       "main": [
-        [
-          {
-            "node": "Call Backend /analysis/start",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "POST /analysis/start", "type": "main", "index": 0 }]
       ]
     },
-    "Call Backend /analysis/start": {
+    "POST /analysis/start": {
       "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Analysis succeeded?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Analysis succeeded?": {
+      "main": [
+        [{ "node": "Respond: Success", "type": "main", "index": 0 }],
+        [{ "node": "Respond: Error",   "type": "main", "index": 0 }]
       ]
     }
   }

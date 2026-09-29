@@ -37,6 +37,7 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./data:/app/data
+      - uploads_data:/app/uploads   # persist uploaded files across container restarts
     ports:
       - "8000:8000"
     command: >
@@ -60,3 +61,4 @@ services:
 volumes:
   db-data:
   n8n_data:
+  uploads_data:   # named volume for uploaded assignment files

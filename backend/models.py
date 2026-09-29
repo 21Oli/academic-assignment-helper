@@ -72,4 +72,7 @@ class AcademicSource(Base):
     abstract = Column(Text)
     full_text = Column(Text)
     source_type = Column(String)  # e.g., 'paper', 'textbook', 'article'
-    embedding = Column(Vector(1536))  # ✅ pgvector column for semantic search
+    # Dimension must match the embedding model in use:
+    # OpenAI text-embedding-3-small / text-embedding-ada-002 → 1536
+    # Local all-MiniLM-L6-v2 fallback → 384 (stored separately; not persisted to DB)
+    embedding = Column(Vector(1536))  # pgvector column — OpenAI embeddings only
