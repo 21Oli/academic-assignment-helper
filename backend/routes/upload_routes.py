@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.models import Assignment, Student
 from backend.database import get_db
 from backend.deps import get_current_student
+from backend.schemas import UploadResponse
 
 import PyPDF2
 import docx
@@ -42,22 +43,26 @@ async def extract_text(file_path: str, filename: str, content: bytes) -> str:
     return text
 
 
-@router.post("/", summary="Upload an assignment file")
+@router.post(
+    "/",
+    response_model=UploadResponse,
+    status_code=201,
+    summary="Upload an assignment file (PDF, DOCX, or plain text)",
+)
 async def upload_assignment(
     file: UploadFile = File(...),
-    current_student: Student = Depends(get_current_student),  # Bearer token auth
+    current_student: Student = Depends(get_current_student),
     db: AsyncSession = Depends(get_db),
 ):
     """
     Upload a .pdf, .docx, or plain-text assignment.
-    Requires:  Authorization: Bearer <token>
-    Returns:   assignment_id to use with /analysis/start
+    Requires: Authorization: Bearer <token>
+    Returns: assignment_id to use with POST /analysis/start
     """
     content = await file.read()
     if len(content) > MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="File too large (max 20 MB)")
 
-    # Sanitise filename and save
     safe_filename = os.path.basename(file.filename or "upload")
     file_path = os.path.join(UPLOAD_DIR, f"{current_student.id}_{safe_filename}")
 
@@ -78,7 +83,7 @@ async def upload_assignment(
     await db.commit()
     await db.refresh(assignment)
 
-    # Notify n8n asynchronously (non-blocking — upload succeeds regardless)
+    # Notify n8n asynchronously — upload succeeds regardless
     if N8N_WEBHOOK_URL:
         try:
             async with httpx.AsyncClient(timeout=10) as client:
@@ -90,8 +95,8 @@ async def upload_assignment(
         except Exception as e:
             print(f"⚠️  Failed to trigger n8n: {e}")
 
-    return {
-        "success": True,
-        "message": "File uploaded successfully",
-        "assignment_id": assignment.id,
-    }
+    return UploadResponse(
+        success=True,
+        message="File uploaded successfully",
+        assignment_id=assignment.id,
+    )

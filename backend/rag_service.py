@@ -11,32 +11,49 @@ import httpx
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.models import AcademicSource, AnalysisResult, Assignment
+from backend.logger import get_logger
+
+logger = get_logger(__name__)
 
 # ---------- Local embedding fallback (384-dim — NOT stored in DB) ----------
-# The DB column is Vector(1536) for OpenAI embeddings. The local model produces
-# 384-dim vectors which are ONLY used for in-process similarity when OpenAI is
-# unavailable; they are never persisted to academic_sources.embedding.
 try:
     from sentence_transformers import SentenceTransformer
     LOCAL_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
     USE_LOCAL_FALLBACK = True
-    print("🧠 Local embedding model loaded (384-dim, in-process only).")
+    logger.info("local_embedding_model.loaded", dims=384, note="in-process only")
 except Exception:
     LOCAL_MODEL = None
     USE_LOCAL_FALLBACK = False
-    print("⚠️  Local embedding model not available.")
+    logger.warning("local_embedding_model.unavailable")
 
 # ---------- Environment Config ----------
-OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-# Unified default — matches .env.example and main.py log message
+# Supports OpenAI AND any OpenAI-compatible API (e.g. NVIDIA NIM).
+# NVIDIA NIM is drop-in compatible: same /embeddings and /chat/completions endpoints.
+#
+# To use NVIDIA NIM:
+#   LLM_API_KEY=nvapi-...
+#   LLM_BASE_URL=https://integrate.api.nvidia.com/v1
+#   EMBEDDING_MODEL=nvidia/nv-embedqa-e5-v5
+#   OPENAI_COMPLETION_MODEL=meta/llama-3.1-70b-instruct
+#   EMBEDDING_DIM=1024   <-- nv-embedqa-e5-v5 produces 1024-dim vectors
+#
+# To use OpenAI (default):
+#   LLM_API_KEY=sk-...   (or OPENAI_API_KEY for backward compat)
+#   LLM_BASE_URL=https://api.openai.com/v1  (default, no need to set)
+#   EMBEDDING_MODEL=text-embedding-3-small
+#   EMBEDDING_DIM=1536
+
+OPENAI_KEY = os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1").rstrip("/")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 COMPLETION_MODEL = os.getenv("OPENAI_COMPLETION_MODEL", "gpt-4o-mini")
 CHUNK_SIZE = int(os.getenv("RAG_CHUNK_SIZE", "2000"))
 PLAGIARISM_THRESHOLD = float(os.getenv("PLAGIARISM_THRESHOLD", "0.85"))
 MAX_RETRIES = 6
 
-# OpenAI text-embedding-3-small and text-embedding-ada-002 both produce 1536-dim vectors.
-OPENAI_EMBEDDING_DIM = 1536
+# DB column is Vector(1536) by default. If you switch to NVIDIA nv-embedqa-e5-v5
+# (1024-dim), set EMBEDDING_DIM=1024 and run an Alembic migration to resize.
+OPENAI_EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", "1536"))
 
 # ---------- Disk-based embedding cache ----------
 CACHE_PATH = "data/embeddings_cache.json"
@@ -58,16 +75,18 @@ def _save_cache() -> None:
         with open(CACHE_PATH, "w", encoding="utf-8") as f:
             json.dump(EMBEDDING_CACHE, f)
     except Exception as e:
-        print(f"⚠️  Could not save embedding cache: {e}")
+        logger.warning("embedding_cache.save_failed", error=str(e))
 
 
-# ---------- OpenAI HTTP helper ----------
+# ---------- LLM/Embedding HTTP helper (OpenAI-compatible) ----------
 async def _openai_post(endpoint: str, payload: dict, timeout: int = 40) -> dict:
     if not OPENAI_KEY:
-        raise RuntimeError("OPENAI_API_KEY is not set.")
+        raise RuntimeError(
+            "No API key set. Add LLM_API_KEY (NVIDIA: nvapi-...) or OPENAI_API_KEY to your .env"
+        )
 
     headers = {"Authorization": f"Bearer {OPENAI_KEY}"}
-    url = f"https://api.openai.com/v1{endpoint}"
+    url = f"{LLM_BASE_URL}{endpoint}"
 
     for attempt in range(1, MAX_RETRIES + 1):
         await asyncio.sleep(random.uniform(1, 3))
@@ -79,52 +98,46 @@ async def _openai_post(endpoint: str, payload: dict, timeout: int = 40) -> dict:
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 429:
                 wait = min(4 ** attempt + random.random(), 60)
-                print(f"⚠️  [429] Retry {attempt}/{MAX_RETRIES} in {wait:.1f}s…")
+                logger.warning("llm_api.rate_limited", attempt=attempt, retry_in=round(wait, 1))
                 await asyncio.sleep(wait)
             elif e.response.status_code in (401, 402):
-                raise RuntimeError("❌ OpenAI quota exceeded or invalid API key.")
+                raise RuntimeError("API key invalid or quota exceeded.")
             else:
                 raise
         except (httpx.ConnectError, httpx.ReadTimeout, httpx.RequestError) as e:
             wait = 2 ** attempt
-            print(f"🌐 [Network] {e}. Retry in {wait}s…")
+            logger.warning("llm_api.network_error", error=str(e), retry_in=wait)
             await asyncio.sleep(wait)
 
-    raise RuntimeError("❌ OpenAI request failed after all retries.")
+    raise RuntimeError(f"LLM API request failed after {MAX_RETRIES} retries.")
 
 
 # ---------- Embedding ----------
 async def get_embedding(text_input: str) -> List[float]:
     """
-    Returns a 1536-dim OpenAI embedding, with an in-process local fallback
-    (384-dim) when OpenAI is unavailable.
-
-    IMPORTANT: local fallback embeddings are returned for runtime similarity
-    comparisons but are NEVER written to the DB (dimension mismatch with
-    the Vector(1536) column would cause a pgvector error).
+    Returns a 1536-dim OpenAI embedding with an in-process local fallback (384-dim).
+    Local fallback embeddings are NEVER written to the DB (dimension mismatch).
     """
     if not text_input.strip():
         return []
 
     key = _hash_text(text_input)
     if key in EMBEDDING_CACHE:
-        print(f"💾 Cache hit {key[:8]}")
+        logger.debug("embedding.cache_hit", key=key[:8])
         return EMBEDDING_CACHE[key]
 
-    # --- Try OpenAI first ---
     try:
         data = await _openai_post("/embeddings", {"model": EMBEDDING_MODEL, "input": text_input})
         embedding = data["data"][0]["embedding"]
         EMBEDDING_CACHE[key] = embedding
         _save_cache()
-        print(f"✅ OpenAI embedding {key[:8]}")
+        logger.debug("embedding.openai_ok", key=key[:8])
         return embedding
     except Exception as e:
-        print(f"⚠️  OpenAI embedding failed: {e}")
+        logger.warning("embedding.openai_failed", error=str(e))
 
-    # --- Local fallback (384-dim, NOT for DB storage) ---
     if USE_LOCAL_FALLBACK and LOCAL_MODEL:
-        print("🔄 Using local fallback embedding (384-dim, in-process only).")
+        logger.info("embedding.local_fallback", note="384-dim, in-process only")
         return LOCAL_MODEL.encode(text_input).tolist()
 
     raise RuntimeError("Embedding failed: OpenAI unavailable and no local fallback.")
@@ -133,7 +146,7 @@ async def get_embedding(text_input: str) -> List[float]:
 async def get_embeddings(texts: List[str]) -> List[List[float]]:
     embeddings = []
     for idx, t in enumerate(texts):
-        print(f"🧠 Embedding chunk {idx + 1}/{len(texts)}…")
+        logger.debug("embedding.chunk", index=idx + 1, total=len(texts))
         embeddings.append(await get_embedding(t))
     return embeddings
 
@@ -169,17 +182,15 @@ async def search_similar_sources(
     top_k: int = 5,
 ) -> List[Dict[str, Any]]:
     """
-    Use pgvector's native <=> (cosine distance) operator for fast server-side
-    nearest-neighbour search, falling back to in-process cosine when the query
-    embedding dimension doesn't match the DB column (e.g. local 384-dim fallback).
+    Uses pgvector's native <=> cosine distance operator (fast, uses HNSW index).
+    Falls back to in-process cosine when dim != 1536 (local fallback scenario).
     """
     dim = len(query_embedding)
 
     if dim == OPENAI_EMBEDDING_DIM:
-        # Fast path: native pgvector <=> (cosine distance = 1 - cosine similarity)
         embedding_literal = "[" + ",".join(str(v) for v in query_embedding) + "]"
         sql = text(
-            f"""
+            """
             SELECT id, title, authors, publication_year, abstract, source_type,
                    1 - (embedding <=> :vec ::vector) AS score
             FROM   academic_sources
@@ -202,10 +213,11 @@ async def search_similar_sources(
             for r in rows
         ]
 
-    # Slow path: dimension mismatch (local 384-dim fallback) — compute in Python
-    print(
-        f"⚠️  Query embedding is {dim}-dim (expected {OPENAI_EMBEDDING_DIM}). "
-        "Falling back to in-process cosine search."
+    logger.warning(
+        "similarity_search.dim_mismatch",
+        query_dim=dim,
+        expected=OPENAI_EMBEDDING_DIM,
+        note="falling back to in-process cosine",
     )
     res = await db.execute(select(AcademicSource))
     sources = res.scalars().all()
@@ -213,17 +225,15 @@ async def search_similar_sources(
     for s in sources:
         if not s.embedding:
             continue
-        scored.append(
-            {
-                "id":               s.id,
-                "title":            s.title,
-                "authors":          s.authors,
-                "publication_year": s.publication_year,
-                "abstract":         s.abstract,
-                "source_type":      s.source_type,
-                "score":            cosine_sim(query_embedding, s.embedding),
-            }
-        )
+        scored.append({
+            "id":               s.id,
+            "title":            s.title,
+            "authors":          s.authors,
+            "publication_year": s.publication_year,
+            "abstract":         s.abstract,
+            "source_type":      s.source_type,
+            "score":            cosine_sim(query_embedding, s.embedding),
+        })
     return sorted(scored, key=lambda x: x["score"], reverse=True)[:top_k]
 
 
@@ -249,7 +259,7 @@ def extract_text_from_file_path(path: str) -> str:
             with open(path, "r", encoding="utf-8", errors="ignore") as fh:
                 return fh.read()
     except Exception as e:
-        print(f"⚠️  File extraction failed for {path}: {e}")
+        logger.warning("file_extraction.failed", path=path, error=str(e))
         return ""
 
 
@@ -259,7 +269,6 @@ async def analyze_assignment_and_save(
     assignment: Assignment,
     top_k_sources: int = 5,
 ) -> Dict[str, Any]:
-    # 1. Get text (from DB record or file)
     text_body = assignment.original_text or ""
     if not text_body and getattr(assignment, "file_path", None):
         loop = asyncio.get_running_loop()
@@ -270,16 +279,15 @@ async def analyze_assignment_and_save(
     if not text_body.strip():
         raise ValueError("No text available for analysis.")
 
-    print(f"📘 Analysing Assignment ID: {assignment.id}")
+    logger.info("analysis.started", assignment_id=assignment.id)
 
-    # 2. Chunk and embed
     max_chunks = int(os.getenv("RAG_MAX_CHUNKS", "3"))
     chunks = chunk_text(text_body)[:max_chunks]
-    print(f"🧩 {len(chunks)} chunk(s) (max {max_chunks})")
+    logger.info("analysis.chunks", count=len(chunks), max=max_chunks)
 
     embeddings = await get_embeddings(chunks)
 
-    # 3. Plagiarism detection — compare each chunk against academic sources
+    # Plagiarism detection
     flagged: List[Dict] = []
     scores: List[float] = []
     for chunk, emb in zip(chunks, embeddings):
@@ -287,19 +295,17 @@ async def analyze_assignment_and_save(
         best = hits[0]["score"] if hits else 0.0
         scores.append(best)
         if best >= PLAGIARISM_THRESHOLD:
-            flagged.append(
-                {
-                    "chunk_preview": chunk[:400],
-                    "score": best,
-                    "best_match": hits[0] if hits else None,
-                    "top_k": hits,
-                }
-            )
+            flagged.append({
+                "chunk_preview": chunk[:400],
+                "score": best,
+                "best_match": hits[0] if hits else None,
+                "top_k": hits,
+            })
 
     plagiarism_score = max(scores) if scores else 0.0
-    print(f"📊 Plagiarism score: {plagiarism_score:.2f}")
+    logger.info("analysis.plagiarism_score", assignment_id=assignment.id, score=round(plagiarism_score, 4))
 
-    # 4. Full-document contextual analysis via GPT
+    # Full-document GPT analysis
     full_emb = await get_embedding(text_body[:15000])
     top_sources = await search_similar_sources(db, full_emb, top_k=top_k_sources)
 
@@ -330,7 +336,6 @@ async def analyze_assignment_and_save(
     if confidence == 0.0:
         confidence = round(max(0.1, 1.0 - plagiarism_score * 0.5), 4)
 
-    # 5. Persist result
     result = AnalysisResult(
         assignment_id=assignment.id,
         suggested_sources=top_sources,
@@ -344,13 +349,12 @@ async def analyze_assignment_and_save(
     await db.commit()
     await db.refresh(result)
 
-    # 6. Back-fill academic_level on the assignment
     if isinstance(parsed, dict) and parsed.get("academic_level"):
         assignment.academic_level = parsed["academic_level"]
         db.add(assignment)
         await db.commit()
 
-    print(f"✅ Analysis complete for Assignment ID: {assignment.id}")
+    logger.info("analysis.complete", assignment_id=assignment.id, analysis_id=result.id)
     return {
         "analysis_id":            result.id,
         "plagiarism_score":       plagiarism_score,

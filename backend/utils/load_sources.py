@@ -4,12 +4,12 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.models import AcademicSource
 from backend.rag_service import get_embedding
+from backend.logger import get_logger
 
-# The sample data lives at data/sample_academic_sources.json (mounted to /app/data in Docker)
-DEFAULT_SOURCES_PATH = os.path.join(
-    os.path.dirname(__file__),  # backend/utils/
-    "..", "..",                  # -> project root
-    "data", "sample_academic_sources.json"
+logger = get_logger(__name__)
+
+DEFAULT_SOURCES_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "data", "sample_academic_sources.json")
 )
 
 
@@ -17,27 +17,25 @@ async def load_academic_sources(db: AsyncSession, path: str = DEFAULT_SOURCES_PA
     """Seed the academic_sources table from a JSON file if it is empty."""
     resolved = os.path.abspath(path)
     if not os.path.exists(resolved):
-        print(f"⚠️  No academic sources file found at {resolved}")
+        logger.warning("load_sources.file_not_found", path=resolved)
         return
 
     with open(resolved, "r", encoding="utf-8") as f:
         sources = json.load(f)
 
-    # SQLAlchemy 2.x requires text() for raw SQL strings
     result = await db.execute(text("SELECT COUNT(*) FROM academic_sources"))
     count = result.scalar()
     if count and count > 0:
-        print(f"✅ Academic sources already loaded ({count} records). Skipping seed.")
+        logger.info("load_sources.already_seeded", count=count)
         return
 
     loaded = 0
     for s in sources:
         abstract = s.get("abstract", "")
         if not abstract:
-            print(f"⚠️  Skipping '{s.get('title')}' — no abstract to embed.")
+            logger.warning("load_sources.skip_no_abstract", title=s.get("title"))
             continue
         try:
-            # get_embedding() takes a single text argument
             embedding = await get_embedding(abstract)
             db.add(AcademicSource(
                 title=s.get("title"),
@@ -50,7 +48,7 @@ async def load_academic_sources(db: AsyncSession, path: str = DEFAULT_SOURCES_PA
             ))
             loaded += 1
         except Exception as e:
-            print(f"⚠️  Failed to embed '{s.get('title')}': {e}")
+            logger.warning("load_sources.embed_failed", title=s.get("title"), error=str(e))
 
     await db.commit()
-    print(f"✅ Loaded {loaded}/{len(sources)} academic sources into database.")
+    logger.info("load_sources.complete", loaded=loaded, total=len(sources))
