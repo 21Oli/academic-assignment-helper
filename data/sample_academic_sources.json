@@ -3,70 +3,350 @@
     "title": "Artificial Intelligence: An Overview of Modern Trends",
     "authors": "John Smith, Emma Brown",
     "publication_year": 2022,
-    "abstract": "An overview of recent developments in artificial intelligence, covering deep learning, natural language processing, and autonomous systems.",
+    "abstract": "An overview of recent developments in artificial intelligence, covering deep learning, natural language processing, and autonomous systems. The paper surveys transformer architectures, reinforcement learning from human feedback, and emerging multimodal models.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Deep Learning for Natural Language Processing",
+    "authors": "Yann LeCun, Yoshua Bengio",
+    "publication_year": 2021,
+    "abstract": "This survey examines how deep neural networks, particularly transformer-based models such as BERT and GPT, have revolutionised natural language processing tasks including translation, summarisation, and question answering.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Large Language Models and Their Applications",
+    "authors": "Tom Brown, Ilya Sutskever",
+    "publication_year": 2023,
+    "abstract": "Explores the capabilities and limitations of large language models trained on massive corpora. Discusses prompt engineering, few-shot learning, chain-of-thought reasoning, and hallucination mitigation strategies.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    "authors": "Patrick Lewis, Ethan Perez",
+    "publication_year": 2020,
+    "abstract": "Introduces retrieval-augmented generation (RAG), a method that combines parametric memory in a language model with non-parametric memory in a dense vector retrieval system to improve factual accuracy.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Ethical Considerations of Artificial Intelligence in Society",
+    "authors": "Mark Wilson, Fatima Abdullahi",
+    "publication_year": 2021,
+    "abstract": "A philosophical exploration of ethical dilemmas related to AI autonomy, bias, and human oversight. Proposes a framework for responsible AI governance and examines case studies of algorithmic discrimination.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "AI Bias and Fairness in Machine Learning Systems",
+    "authors": "Timnit Gebru, Margaret Mitchell",
+    "publication_year": 2022,
+    "abstract": "Analyses sources of bias in machine learning pipelines from data collection through model deployment. Presents evaluation metrics for fairness and discusses mitigation techniques including re-sampling, re-weighting, and adversarial debiasing.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Explainable AI: Interpretability and Transparency",
+    "authors": "Cynthia Rudin, Been Kim",
+    "publication_year": 2023,
+    "abstract": "Reviews methods for making machine learning models interpretable, including LIME, SHAP, attention visualisation, and inherently interpretable architectures. Argues that interpretability is essential for high-stakes decision-making.",
     "source_type": "Journal Article"
   },
   {
     "title": "The Future of Renewable Energy in Developing Nations",
     "authors": "Amina Yusuf, Carlos Hernandez",
     "publication_year": 2021,
-    "abstract": "This paper explores renewable energy strategies for developing nations, focusing on solar and wind energy adoption challenges.",
+    "abstract": "This paper explores renewable energy strategies for developing nations, focusing on solar and wind energy adoption challenges including grid infrastructure, financing, policy frameworks, and community engagement.",
     "source_type": "Conference Paper"
   },
   {
-    "title": "Blockchain Technology in Financial Systems",
-    "authors": "Liu Chen, Robert Davis",
-    "publication_year": 2020,
-    "abstract": "A detailed analysis of how blockchain can transform traditional banking, reduce fraud, and enable decentralized finance.",
-    "source_type": "Research Paper"
-  },
-  {
-    "title": "Integrating Educational Technology for Better Learning Outcomes",
-    "authors": "Sarah Johnson, Ahmed Nasser",
-    "publication_year": 2023,
-    "abstract": "A study on the integration of educational technologies in higher education and their impact on student engagement and performance.",
-    "source_type": "Journal Article"
-  },
-  {
-    "title": "AI Applications in Modern Healthcare",
-    "authors": "Priya Kumar, Daniel Roberts",
+    "title": "Solar Energy Technologies: Efficiency and Cost Reduction",
+    "authors": "Priya Sharma, Diego Torres",
     "publication_year": 2022,
-    "abstract": "An examination of artificial intelligence applications in medical diagnostics, predictive healthcare, and patient data management.",
-    "source_type": "Book Chapter"
-  },
-  {
-    "title": "Cybersecurity Challenges in the Age of Cloud Computing",
-    "authors": "Michael Green, Laura Perez",
-    "publication_year": 2019,
-    "abstract": "A review of cloud computing vulnerabilities and strategies to enhance data security in distributed environments.",
-    "source_type": "White Paper"
-  },
-  {
-    "title": "Sustainable Urban Development and Smart Cities",
-    "authors": "Elena Petrova, Samuel Lee",
-    "publication_year": 2020,
-    "abstract": "Discusses the role of IoT and data analytics in shaping sustainable smart cities with efficient resource management.",
+    "abstract": "Reviews advances in photovoltaic cell technologies including perovskite solar cells, bifacial panels, and concentrated solar power systems. Analyses cost curves and learning rates that have driven solar LCOE reductions.",
     "source_type": "Journal Article"
   },
   {
-    "title": "Ethical Considerations of Artificial Intelligence in Society",
-    "authors": "Mark Wilson, Fatima Abdullahi",
-    "publication_year": 2021,
-    "abstract": "A philosophical exploration of ethical dilemmas related to AI autonomy, bias, and human oversight.",
-    "source_type": "Conference Paper"
+    "title": "Climate Change Mitigation through Carbon Capture",
+    "authors": "James Clarke, Anika Schmidt",
+    "publication_year": 2023,
+    "abstract": "Examines direct air capture and bioenergy with carbon capture and storage technologies, their current costs, scalability, energy penalties, and potential contribution to net-zero emissions pathways by 2050.",
+    "source_type": "Research Paper"
   },
   {
     "title": "Machine Learning for Climate Prediction",
     "authors": "Olivia Martin, Ethan Kim",
     "publication_year": 2023,
-    "abstract": "Examines the use of machine learning models for forecasting weather patterns and climate change impacts.",
+    "abstract": "Examines the use of machine learning models for forecasting weather patterns and climate change impacts. Discusses neural weather prediction models, downscaling techniques, and uncertainty quantification in climate projections.",
     "source_type": "Research Paper"
+  },
+  {
+    "title": "Blockchain Technology in Financial Systems",
+    "authors": "Liu Chen, Robert Davis",
+    "publication_year": 2020,
+    "abstract": "A detailed analysis of how blockchain can transform traditional banking, reduce fraud, and enable decentralised finance. Reviews consensus mechanisms, smart contracts, and regulatory challenges facing DeFi adoption.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Decentralised Finance: Opportunities and Risks",
+    "authors": "Andreas Antonopoulos, Rachel Simons",
+    "publication_year": 2022,
+    "abstract": "Surveys the DeFi ecosystem including automated market makers, lending protocols, yield farming, and governance tokens. Analyses systemic risks such as flash loan attacks, oracle manipulation, and liquidity crises.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Cryptocurrency Market Volatility and Investor Behaviour",
+    "authors": "Nadia Kowalski, Hiroshi Tanaka",
+    "publication_year": 2021,
+    "abstract": "Applies behavioural finance theory to analyse cryptocurrency market volatility, including herding behaviour, sentiment-driven price movements, and the role of social media in amplifying speculative bubbles.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Integrating Educational Technology for Better Learning Outcomes",
+    "authors": "Sarah Johnson, Ahmed Nasser",
+    "publication_year": 2023,
+    "abstract": "A study on the integration of educational technologies in higher education and their impact on student engagement and performance. Examines LMS platforms, gamification, adaptive learning, and AI-powered tutoring systems.",
+    "source_type": "Journal Article"
   },
   {
     "title": "Digital Transformation in Higher Education",
     "authors": "Anna Scott, Yared Tsegaye",
     "publication_year": 2024,
-    "abstract": "This research analyzes how universities are leveraging technology to modernize education delivery and improve learning experiences.",
+    "abstract": "Analyses how universities are leveraging technology to modernise education delivery and improve learning experiences. Covers online learning adoption post-pandemic, hybrid models, and digital equity challenges.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Personalised Learning with Adaptive Educational Systems",
+    "authors": "Carla Mendez, Kwame Asante",
+    "publication_year": 2022,
+    "abstract": "Reviews intelligent tutoring systems and adaptive learning platforms that personalise content difficulty, pacing, and feedback. Evaluates evidence for their effectiveness across K-12 and higher education contexts.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Academic Integrity in the Age of Generative AI",
+    "authors": "Laura Chen, Marcus Weber",
+    "publication_year": 2024,
+    "abstract": "Examines challenges to academic integrity posed by large language models and AI writing assistants. Proposes detection strategies, assessment redesign, and institutional policy frameworks for responsible AI use in education.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Plagiarism Detection Using Natural Language Processing",
+    "authors": "Sergei Volkov, Maya Okafor",
+    "publication_year": 2021,
+    "abstract": "Surveys NLP-based plagiarism detection techniques including fingerprinting, semantic similarity using sentence embeddings, and cross-language plagiarism detection. Benchmarks performance on standard corpora.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "AI Applications in Modern Healthcare",
+    "authors": "Priya Kumar, Daniel Roberts",
+    "publication_year": 2022,
+    "abstract": "An examination of artificial intelligence applications in medical diagnostics, predictive healthcare, and patient data management. Reviews CNN-based radiology, NLP for clinical notes, and federated learning for privacy-preserving medical AI.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Electronic Health Records and Data Interoperability",
+    "authors": "Susan Park, Thomas Adeyemi",
+    "publication_year": 2021,
+    "abstract": "Analyses challenges and standards for EHR interoperability including HL7 FHIR, SNOMED CT, and ICD-11. Reviews barriers to data sharing across healthcare systems and the role of APIs in enabling a connected health ecosystem.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Telemedicine Adoption and Patient Outcomes",
+    "authors": "Fatima Rashid, Benjamin Clarke",
+    "publication_year": 2023,
+    "abstract": "Meta-analysis of telemedicine outcomes across chronic disease management, mental health, and primary care. Examines barriers including digital literacy, broadband access, and reimbursement policies that influence adoption rates.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Mental Health and Social Media Use Among Adolescents",
+    "authors": "Sophie Laurent, Daniel Osei",
+    "publication_year": 2023,
+    "abstract": "Systematic review of longitudinal studies examining the relationship between social media use and mental health outcomes in adolescents, including depression, anxiety, body image, and sleep disruption.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Cybersecurity Challenges in the Age of Cloud Computing",
+    "authors": "Michael Green, Laura Perez",
+    "publication_year": 2019,
+    "abstract": "A review of cloud computing vulnerabilities and strategies to enhance data security in distributed environments. Covers shared responsibility models, zero-trust architecture, encryption, and compliance frameworks such as SOC 2 and ISO 27001.",
+    "source_type": "White Paper"
+  },
+  {
+    "title": "Zero Trust Security Architecture",
+    "authors": "John Kindervag, Chase Cunningham",
+    "publication_year": 2022,
+    "abstract": "Defines zero trust security principles and details implementation patterns including micro-segmentation, identity-centric access control, continuous verification, and least-privilege enforcement across cloud-native environments.",
+    "source_type": "White Paper"
+  },
+  {
+    "title": "Ransomware Attacks: Trends, Impact, and Mitigation",
+    "authors": "Alexei Petrov, Nicole Dumont",
+    "publication_year": 2023,
+    "abstract": "Analyses trends in ransomware-as-a-service ecosystems, double extortion tactics, and supply chain attacks. Presents a tiered mitigation framework covering prevention, detection, incident response, and recovery.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Privacy Regulations and Their Impact on Data Engineering",
+    "authors": "Ingrid Larsson, Emmanuel Fofana",
+    "publication_year": 2022,
+    "abstract": "Reviews GDPR, CCPA, and emerging global privacy laws and their technical implications for data pipelines. Discusses data minimisation, purpose limitation, consent management, and privacy-by-design engineering practices.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Sustainable Urban Development and Smart Cities",
+    "authors": "Elena Petrova, Samuel Lee",
+    "publication_year": 2020,
+    "abstract": "Discusses the role of IoT and data analytics in shaping sustainable smart cities with efficient resource management. Covers smart grids, intelligent transport, digital twins, and participatory governance in urban planning.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Internet of Things Security and Privacy Challenges",
+    "authors": "Wei Zhang, Isabella Martins",
+    "publication_year": 2022,
+    "abstract": "Surveys security vulnerabilities in IoT devices and networks including weak authentication, unencrypted communications, firmware attacks, and botnets. Proposes a layered security framework for IoT deployments.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "5G Networks: Architecture, Applications, and Security",
+    "authors": "Ravi Patel, Chiara Romano",
+    "publication_year": 2023,
+    "abstract": "Describes 5G network slicing, massive MIMO, edge computing integration, and ultra-reliable low-latency communications. Analyses security threats specific to 5G including signalling attacks and supply chain risks.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Supply Chain Resilience in a Post-Pandemic World",
+    "authors": "Victor Okonkwo, Lisa Huang",
+    "publication_year": 2022,
+    "abstract": "Examines how the COVID-19 pandemic exposed supply chain fragilities. Reviews strategies for building resilience including nearshoring, supplier diversification, digital twins, and AI-powered demand forecasting.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Globalisation, Trade Policy, and Economic Inequality",
+    "authors": "Amartya Sen, Dambisa Moyo",
+    "publication_year": 2021,
+    "abstract": "Critically examines how globalisation has shaped income distribution within and across nations. Analyses the roles of trade agreements, intellectual property regimes, and labour standards in determining distributional outcomes.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Microeconomics of Platform Competition",
+    "authors": "Jean Tirole, Fiona Scott Morton",
+    "publication_year": 2022,
+    "abstract": "Applies two-sided market theory to analyse competition dynamics in digital platform markets. Discusses tipping, multi-homing, network effects, and antitrust challenges posed by dominant platforms.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Quantum Computing: Principles and Applications",
+    "authors": "Mikhail Lukin, John Preskill",
+    "publication_year": 2023,
+    "abstract": "Introduces quantum computing principles including superposition, entanglement, and quantum error correction. Reviews current hardware approaches and near-term applications in cryptography, drug discovery, and optimisation.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Post-Quantum Cryptography Standards",
+    "authors": "Dustin Moody, Daniel Smith-Tone",
+    "publication_year": 2024,
+    "abstract": "Describes NIST's post-quantum cryptography standardisation process and the selected algorithms CRYSTALS-Kyber and CRYSTALS-Dilithium. Discusses migration strategies for organisations transitioning from RSA and ECC.",
+    "source_type": "White Paper"
+  },
+  {
+    "title": "Edge Computing and Distributed AI Inference",
+    "authors": "Flavio Bonomi, Rajkumar Buyya",
+    "publication_year": 2023,
+    "abstract": "Examines edge computing architectures that bring AI inference closer to data sources, reducing latency and bandwidth requirements. Covers model compression techniques including pruning, quantisation, and knowledge distillation.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Federated Learning for Privacy-Preserving Machine Learning",
+    "authors": "Brendan McMahan, Peter Kairouz",
+    "publication_year": 2021,
+    "abstract": "Describes federated learning protocols that train models across distributed devices without centralising raw data. Analyses communication efficiency, differential privacy integration, and robustness to adversarial participants.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Reinforcement Learning: Algorithms and Applications",
+    "authors": "David Silver, Pieter Abbeel",
+    "publication_year": 2022,
+    "abstract": "Surveys model-free and model-based reinforcement learning algorithms including PPO, SAC, and MuZero. Reviews applications in robotics, game playing, recommendation systems, and scientific discovery.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Computer Vision for Medical Image Analysis",
+    "authors": "Seyedeh Sadeghi, Geoffrey Hinton",
+    "publication_year": 2023,
+    "abstract": "Reviews deep learning methods for medical image segmentation, classification, and detection including U-Net variants, vision transformers, and self-supervised pre-training on large unlabelled radiology datasets.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Autonomous Vehicles: Perception, Planning, and Safety",
+    "authors": "Sebastian Thrun, Raquel Urtasun",
+    "publication_year": 2022,
+    "abstract": "Covers the perception, prediction, and planning stack for autonomous driving systems. Discusses sensor fusion of LiDAR, cameras, and radar, end-to-end learning approaches, and safety validation methodologies.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Natural Language Generation and Text Summarisation",
+    "authors": "Ramesh Nallapati, Bowen Zhou",
+    "publication_year": 2021,
+    "abstract": "Reviews extractive and abstractive summarisation approaches. Covers encoder-decoder architectures, copy mechanisms, factual consistency evaluation, and the ROUGE and BERTScore evaluation metrics.",
+    "source_type": "Conference Paper"
+  },
+  {
+    "title": "Knowledge Graphs and Semantic Web Technologies",
+    "authors": "Tom Heath, Christian Bizer",
+    "publication_year": 2020,
+    "abstract": "Introduces knowledge graph construction, entity linking, and relation extraction. Reviews RDF, OWL, and SPARQL standards, and applications in search, recommendation, and question answering over structured knowledge.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Software Engineering Best Practices for AI Systems",
+    "authors": "Martin Fowler, Cassie Kozyrkov",
+    "publication_year": 2023,
+    "abstract": "Applies software engineering principles to ML system development. Covers MLOps, continuous training pipelines, data versioning, model monitoring, canary deployments, and testing strategies for non-deterministic systems.",
+    "source_type": "White Paper"
+  },
+  {
+    "title": "Microservices Architecture and Containerisation",
+    "authors": "Sam Newman, Kelsey Hightower",
+    "publication_year": 2022,
+    "abstract": "Discusses microservices design patterns including service mesh, API gateway, saga pattern, and event-driven choreography. Reviews Kubernetes orchestration, service discovery, and observability with distributed tracing.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Data Engineering: Pipelines, Lakes, and Mesh Architecture",
+    "authors": "Zhamak Dehghani, Maxime Beauchemin",
+    "publication_year": 2023,
+    "abstract": "Contrasts centralised data lake and warehouse architectures against the data mesh paradigm. Covers stream processing with Apache Kafka and Flink, data quality frameworks, and the role of metadata management.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Psychology of Learning and Cognitive Load Theory",
+    "authors": "John Sweller, Paul Ayres",
+    "publication_year": 2019,
+    "abstract": "Presents cognitive load theory as a framework for instructional design. Distinguishes intrinsic, extraneous, and germane load, and derives evidence-based guidelines for multimedia learning and worked example design.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Public Health Informatics and Disease Surveillance",
+    "authors": "Aaditya Iyer, Beatrice Okonkwo",
+    "publication_year": 2022,
+    "abstract": "Reviews health informatics systems used for infectious disease surveillance, outbreak detection, and epidemic modelling. Discusses syndromic surveillance, wastewater epidemiology, and real-time dashboards used during COVID-19.",
+    "source_type": "Journal Article"
+  },
+  {
+    "title": "Social Network Analysis and Information Diffusion",
+    "authors": "Duncan Watts, Jon Kleinberg",
+    "publication_year": 2021,
+    "abstract": "Applies graph theory to model information diffusion, opinion formation, and misinformation spread in social networks. Covers centrality measures, community detection, and cascade models such as SIR and threshold models.",
+    "source_type": "Research Paper"
+  },
+  {
+    "title": "Human-Computer Interaction and Accessibility Design",
+    "authors": "Donald Norman, Wendy Chung",
+    "publication_year": 2022,
+    "abstract": "Covers HCI principles including affordances, feedback, and mapping. Reviews accessibility standards (WCAG 2.2), inclusive design methodologies, and empirical usability testing methods with diverse user populations.",
+    "source_type": "Book Chapter"
+  },
+  {
+    "title": "Neuroscience of Memory and Learning",
+    "authors": "Eric Kandel, Howard Eichenbaum",
+    "publication_year": 2020,
+    "abstract": "Explains the neurobiological mechanisms of memory formation, consolidation, and retrieval. Covers long-term potentiation, hippocampal-cortical interaction, and implications for spaced repetition and retrieval practice in education.",
     "source_type": "Journal Article"
   }
 ]
