@@ -326,6 +326,4 @@ GitHub Actions (`.github/workflows/ci.yml`) runs on every push/PR:
 
 ---
 
-## 👨‍💻 Author
 
-Oli Bakala — Software Engineer
