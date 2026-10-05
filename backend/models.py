@@ -74,7 +74,8 @@ class AcademicSource(Base):
     source_type = Column(String)  # e.g., 'paper', 'textbook', 'article'
     # Dimension is configurable via EMBEDDING_DIM env var:
     # - 1536 for OpenAI text-embedding-3-small / ada-002 (default)
-    # - 1024 for NVIDIA nv-embedqa-e5-v5
-    # If you change this, run: alembic upgrade head (migration 0002)
+    # - 2048 for NVIDIA nemotron-3-embed-1b
+    # - 1024 for NVIDIA nv-embedqa-e5-v5 (EOL)
+    # If you change this, wipe the DB volume and restart.
     _dim = int(__import__("os").getenv("EMBEDDING_DIM", "1536"))
-    embedding = Column(Vector(_dim))  # pgvector column — OpenAI embeddings only
+    embedding = Column(Vector(_dim))

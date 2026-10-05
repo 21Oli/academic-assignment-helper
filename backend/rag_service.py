@@ -4,7 +4,7 @@ import json
 import hashlib
 import random
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 import numpy as np
 import httpx
@@ -89,7 +89,7 @@ async def _openai_post(endpoint: str, payload: dict, timeout: int = 40) -> dict:
     url = f"{LLM_BASE_URL}{endpoint}"
 
     for attempt in range(1, MAX_RETRIES + 1):
-        await asyncio.sleep(random.uniform(1, 3))
+        await asyncio.sleep(random.uniform(0.3, 1.0))
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 resp = await client.post(url, headers=headers, json=payload)
@@ -112,6 +112,11 @@ async def _openai_post(endpoint: str, payload: dict, timeout: int = 40) -> dict:
     raise RuntimeError(f"LLM API request failed after {MAX_RETRIES} retries.")
 
 
+def _is_nvidia_nim() -> bool:
+    """Returns True when LLM_BASE_URL points at NVIDIA NIM."""
+    return "nvidia.com" in LLM_BASE_URL
+
+
 # ---------- Embedding ----------
 async def get_embedding(text_input: str) -> List[float]:
     """
@@ -127,14 +132,18 @@ async def get_embedding(text_input: str) -> List[float]:
         return EMBEDDING_CACHE[key]
 
     try:
-        data = await _openai_post("/embeddings", {"model": EMBEDDING_MODEL, "input": text_input})
+        payload: dict = {"model": EMBEDDING_MODEL, "input": text_input}
+        # Only nv-embedqa and E5 models require input_type — nemotron-3-embed does not
+        if _is_nvidia_nim() and any(x in EMBEDDING_MODEL for x in ("embedqa", "e5")):
+            payload["input_type"] = "passage"
+        data = await _openai_post("/embeddings", payload)
         embedding = data["data"][0]["embedding"]
         EMBEDDING_CACHE[key] = embedding
         _save_cache()
-        logger.debug("embedding.openai_ok", key=key[:8])
+        logger.debug("embedding.api_ok", key=key[:8])
         return embedding
     except Exception as e:
-        logger.warning("embedding.openai_failed", error=str(e))
+        logger.warning("embedding.api_failed", error=str(e))
 
     if USE_LOCAL_FALLBACK and LOCAL_MODEL:
         logger.info("embedding.local_fallback", note="384-dim, in-process only")
@@ -336,13 +345,22 @@ async def analyze_assignment_and_save(
     if confidence == 0.0:
         confidence = round(max(0.1, 1.0 - plagiarism_score * 0.5), 4)
 
+    # LLM may return research_suggestions / citation_recommendations as lists
+    # but the DB columns are Text — join them into newline-separated strings
+    def _to_text(val: Any) -> str:
+        if val is None:
+            return ""
+        if isinstance(val, list):
+            return "\n".join(str(item) for item in val)
+        return str(val)
+
     result = AnalysisResult(
         assignment_id=assignment.id,
         suggested_sources=top_sources,
         plagiarism_score=plagiarism_score,
         flagged_sections=flagged,
-        research_suggestions=parsed.get("research_suggestions", "") if isinstance(parsed, dict) else "",
-        citation_recommendations=parsed.get("citation_recommendations", "") if isinstance(parsed, dict) else "",
+        research_suggestions=_to_text(parsed.get("research_suggestions", "")) if isinstance(parsed, dict) else "",
+        citation_recommendations=_to_text(parsed.get("citation_recommendations", "")) if isinstance(parsed, dict) else "",
         confidence_score=confidence,
     )
     db.add(result)

@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from backend.database import get_db
+from backend.logger import get_logger
 from backend.models import Assignment, AnalysisResult, Student
 from backend.rag_service import analyze_assignment_and_save
 from backend.deps import get_current_student
@@ -20,6 +21,7 @@ from backend.schemas import (
 
 router = APIRouter(prefix="/analysis", tags=["Analysis"])
 _limiter = Limiter(key_func=get_remote_address)
+logger = get_logger(__name__)
 
 
 @router.post(
@@ -57,6 +59,8 @@ async def start_analysis(
         try:
             summary = await analyze_assignment_and_save(db, assignment, top_k_sources=5)
         except Exception as e:
+            import traceback
+            logger.error("analysis.route_failed", assignment_id=body.assignment_id, error=str(e), traceback=traceback.format_exc())
             raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
         return StartAnalysisSingleResponse(
