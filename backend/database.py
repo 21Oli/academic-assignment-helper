@@ -1,5 +1,7 @@
 import os
 import ssl
+from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
+
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 
@@ -7,24 +9,43 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL environment variable not set")
 
-# asyncpg does not accept ?sslmode=require in the URL — strip it out and
-# pass SSL via connect_args instead. This handles both Neon (production)
-# and local Docker Postgres (no SSL needed).
-_url = DATABASE_URL
-_connect_args: dict = {}
 
-if "sslmode=require" in _url:
-    # Remove the query param and configure SSL properly for asyncpg
-    _url = _url.replace("?sslmode=require", "").replace("&sslmode=require", "")
-    _ssl_ctx = ssl.create_default_context()
-    _connect_args["ssl"] = _ssl_ctx
-elif "ssl=true" in _url:
-    _url = _url.replace("?ssl=true", "").replace("&ssl=true", "")
-    _ssl_ctx = ssl.create_default_context()
-    _connect_args["ssl"] = _ssl_ctx
+def _build_engine_args(raw_url: str) -> tuple[str, dict]:
+    """
+    asyncpg does not support SSL-related query params (sslmode, ssl,
+    channel_binding, etc.) in the connection URL — they must be passed
+    via connect_args.
+
+    This function:
+    1. Strips ALL query params from the URL
+    2. Returns a clean URL + connect_args with SSL configured if the
+       original URL contained any SSL-related params.
+    """
+    parsed = urlparse(raw_url)
+    params = parse_qs(parsed.query)
+
+    # Detect whether SSL is required
+    needs_ssl = (
+        params.get("sslmode", [""])[0] in ("require", "verify-ca", "verify-full")
+        or params.get("ssl", [""])[0] in ("true", "1", "require")
+    )
+
+    # Remove ALL query params — asyncpg doesn't handle any of them
+    clean = parsed._replace(query="")
+    clean_url = urlunparse(clean)
+
+    connect_args: dict = {}
+    if needs_ssl:
+        ctx = ssl.create_default_context()
+        connect_args["ssl"] = ctx
+
+    return clean_url, connect_args
+
+
+_clean_url, _connect_args = _build_engine_args(DATABASE_URL)
 
 engine = create_async_engine(
-    _url,
+    _clean_url,
     future=True,
     echo=False,
     connect_args=_connect_args,
