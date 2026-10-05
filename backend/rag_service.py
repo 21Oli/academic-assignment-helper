@@ -320,9 +320,15 @@ async def analyze_assignment_and_save(
 
     sys_prompt = (
         "You are an academic assistant. Given an assignment excerpt and related "
-        "academic sources, return a JSON object with these fields: topic, "
-        "key_themes (list), research_questions (list), academic_level, "
-        "research_suggestions, citation_recommendations, confidence_score (0-1)."
+        "academic sources, return a JSON object with these fields: topic (string), "
+        "key_themes (list of strings), research_questions (list of strings), "
+        "academic_level (string e.g. undergraduate/postgraduate), "
+        "research_suggestions (list of plain strings — each a concrete suggestion), "
+        "citation_recommendations (list of plain strings — each a full APA citation, "
+        "e.g. 'Smith, J. (2022). Title. Journal.'), "
+        "confidence_score (number 0-1). "
+        "Return ONLY valid JSON. Do not wrap in markdown. "
+        "All list items must be plain strings, not objects or dicts."
     )
     sources_brief = "\n".join(
         f"- {s['title']} ({s['publication_year']}) by {s['authors']}"
@@ -345,13 +351,44 @@ async def analyze_assignment_and_save(
     if confidence == 0.0:
         confidence = round(max(0.1, 1.0 - plagiarism_score * 0.5), 4)
 
-    # LLM may return research_suggestions / citation_recommendations as lists
-    # but the DB columns are Text — join them into newline-separated strings
+    # LLM may return research_suggestions / citation_recommendations as:
+    #   - a plain string  → use as-is
+    #   - a list of strings → join with newlines
+    #   - a list of dicts (citation objects) → format each into a readable string
+    def _format_citation(item: Any) -> str:
+        """Convert a citation dict like {'title':..., 'authors':..., 'year':...} to a readable string."""
+        if not isinstance(item, dict):
+            return str(item)
+        parts = []
+        # Authors
+        authors = item.get("authors", "")
+        if isinstance(authors, list):
+            authors = ", ".join(str(a) for a in authors)
+        if authors:
+            parts.append(str(authors))
+        # Year
+        year = item.get("year") or item.get("publication_year") or item.get("date", "")
+        if year:
+            parts.append(f"({year})")
+        # Title
+        title = item.get("title", "")
+        if title:
+            parts.append(f"*{title}*")
+        # Journal / publisher
+        journal = item.get("journal") or item.get("publisher") or item.get("source", "")
+        if journal:
+            parts.append(str(journal))
+        # Note
+        note = item.get("note", "")
+        if note:
+            parts.append(f"— {note}")
+        return " ".join(parts) if parts else str(item)
+
     def _to_text(val: Any) -> str:
         if val is None:
             return ""
         if isinstance(val, list):
-            return "\n".join(str(item) for item in val)
+            return "\n".join(_format_citation(item) for item in val)
         return str(val)
 
     result = AnalysisResult(
