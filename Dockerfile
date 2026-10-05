@@ -28,6 +28,9 @@ RUN if [ "$ENABLE_LOCAL_EMBEDDINGS" = "true" ]; then \
 # Copy backend source (hot-reload via volume mount in docker-compose)
 COPY backend /app/backend
 
+# Copy academic sources data for seeding on startup
+COPY data /app/data
+
 # Copy Alembic config so migrations can run inside the container
 COPY alembic.ini /app/alembic.ini
 COPY alembic /app/alembic
@@ -38,5 +41,4 @@ ENV PYTHONUNBUFFERED=1
 # Expose the port Uvicorn listens on
 EXPOSE 8000
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", \
-     "--reload", "--reload-dir", "/app/backend"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
