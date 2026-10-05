@@ -31,11 +31,11 @@ import { isLoggedIn } from "@/lib/auth";
 
 // Turnitin-style color scale
 function getScoreStyle(score: number) {
-  if (score === 0)    return { text: "text-blue-600",    bg: "bg-blue-50",    ring: "ring-blue-200",    label: "No matches found",      bar: "bg-blue-500" };
-  if (score < 0.25)   return { text: "text-emerald-600", bg: "bg-emerald-50", ring: "ring-emerald-200", label: "Low similarity",        bar: "bg-emerald-500" };
-  if (score < 0.50)   return { text: "text-amber-600",   bg: "bg-amber-50",   ring: "ring-amber-200",   label: "Moderate similarity",   bar: "bg-amber-500" };
-  if (score < 0.75)   return { text: "text-orange-600",  bg: "bg-orange-50",  ring: "ring-orange-200",  label: "High similarity",       bar: "bg-orange-500" };
-  return                      { text: "text-red-600",    bg: "bg-red-50",     ring: "ring-red-200",     label: "Very high similarity",  bar: "bg-red-500" };
+  if (score === 0)    return { text: "text-blue-600",    bg: "bg-blue-50",    ring: "ring-blue-200",    label: "No matches found",     bar: "bg-blue-500",    badge: "bg-blue-50 text-blue-700" };
+  if (score < 0.25)   return { text: "text-emerald-600", bg: "bg-emerald-50", ring: "ring-emerald-200", label: "Low similarity",        bar: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700" };
+  if (score < 0.50)   return { text: "text-amber-600",   bg: "bg-amber-50",   ring: "ring-amber-200",   label: "Moderate similarity",  bar: "bg-amber-500",   badge: "bg-amber-50 text-amber-700" };
+  if (score < 0.75)   return { text: "text-orange-600",  bg: "bg-orange-50",  ring: "ring-orange-200",  label: "High similarity",      bar: "bg-orange-500",  badge: "bg-orange-50 text-orange-700" };
+  return                      { text: "text-red-600",    bg: "bg-red-50",     ring: "ring-red-200",     label: "Very high similarity", bar: "bg-red-500",     badge: "bg-red-50 text-red-700" };
 }
 
 export default function AssignmentDetailPage() {
