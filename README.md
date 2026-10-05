@@ -4,6 +4,16 @@ An AI-powered academic integrity platform that uses **Retrieval-Augmented Genera
 
 ---
 
+## 📸 Screenshots
+
+### Dashboard — Upload & Assignment List
+![AcademicGuard Dashboard](docs/screenshots/dashboard.png)
+
+### Analysis Report — Similarity Score & Results
+![AcademicGuard Analysis Report](docs/screenshots/report.png)
+
+---
+
 ## 🚀 Overview
 
 Students upload assignments (PDF, DOCX, or plain text). The system:
