@@ -3,7 +3,7 @@ import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { GraduationCap } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { login } from "@/lib/api";
 import { saveToken } from "@/lib/auth";
 
@@ -34,10 +34,10 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-2">
           <div className="rounded-2xl bg-brand-600 p-3 text-white shadow-lg">
-            <GraduationCap size={28} />
+            <ShieldCheck size={28} />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Assignment Helper</h1>
-          <p className="text-sm text-slate-500">AI-powered academic analysis</p>
+          <h1 className="text-2xl font-bold text-slate-900">AcademicGuard</h1>
+          <p className="text-sm text-slate-500">AI-Powered Plagiarism Detection</p>
         </div>
 
         <div className="card">

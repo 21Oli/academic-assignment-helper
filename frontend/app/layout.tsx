@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Academic Assignment Helper",
-  description: "AI-powered assignment analysis and plagiarism detection",
+  title: "AcademicGuard — AI Plagiarism Detection",
+  description: "AI-powered plagiarism detection and academic analysis platform using RAG and semantic similarity search",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
